@@ -1,0 +1,6 @@
+langchain
+langchain-ollama
+langchain-google-genai
+langchain-openai
+python-dotenv
+numpy
