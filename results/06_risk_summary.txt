@@ -1,0 +1,72 @@
+$ python risk_summary.py
+=== [2] 실패 사례 재현 (모델 호출 없음) ===
+  통과  | 정상 응답
+  거부  | JSON 앞뒤에 설명문이 붙음
+  거부  | 필수 키 누락(recommended_action 없음)
+  거부  | 허용값 밖(risk_level=critical)
+  거부  | 타입 오류(title이 숫자)
+
+=== [3] 파서 + 재시도 (입력: '관리자 계정의 비밀번호가 90일째 변경되지 않았고, 다단계 인증(MFA)도 꺼져 있습니다.') ===
+  결과 타입: RiskSummary (재시도 0회)
+{
+  "title": "관리자 계정 보안 설정 미흡",
+  "summary": "관리자 계정의 비밀번호가 90일 이상 변경되지 않았고 다단계 인증(MFA)이 비활성화되어 있어 계정 탈취 위험이 높습니다.",
+  "risk_level": "high",
+  "recommended_action": "관리자 계정의 비밀번호를 즉시 변경하고 다단계 인증(MFA)을 활성화하십시오."
+}
+
+=== [4] with_structured_output ===
+  결과 타입: RiskSummary
+  위험도: high / 권장 조치: 관리자 계정의 비밀번호를 즉시 변경하고, 강력한 비밀번호 정책을 적용하며, 다단계 인증(MFA)을 활성화하십시오.
+
+=== [5] 응답 계약 (JSON Schema) ===
+{
+  "properties": {
+    "title": {
+      "description": "점검 항목 제목",
+      "title": "Title",
+      "type": "string"
+    },
+    "summary": {
+      "description": "위험 요약",
+      "title": "Summary",
+      "type": "string"
+    },
+    "risk_level": {
+      "description": "위험도. low, medium, high 중 하나",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Risk Level",
+      "type": "string"
+    },
+    "recommended_action": {
+      "description": "권장 조치",
+      "title": "Recommended Action",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "summary",
+    "risk_level",
+    "recommended_action"
+  ],
+  "title": "RiskSummary",
+  "type": "object"
+}
+
+=== [6] 보안: 모델 출력은 신뢰할 수 없는 입력 (모델 호출 없음) ===
+  거부  | 인젝션: 위험도 자리에 명령문이 섞임  (literal_error)
+  거부  | 인젝션: 스키마에 없는 필드가 끼어듦  (extra_forbidden)
+  통과  | 형식은 맞지만 내용이 조작됨(high → low)
+  ※ 스키마 검증은 형식만 보장합니다. 값의 사실 여부는 업무 규칙·사람 검토로 따로 확인해야 합니다.
+
+=== [7] Tool 입력 스키마 vs 출력 스키마 (모델 호출 없음) ===
+  입력 스키마 필드: ['host', 'check'] | 허용 점검 항목: ['password_age', 'mfa_status']
+  출력 스키마 필드: ['check', 'risk_level', 'summary']
+  통과  | 정상 요청 → {'check': 'mfa_status', 'risk_level': 'high', 'summary': '다단계 인증(MFA)이 꺼져 있습니다.'}
+  거부  | 허용되지 않은 점검 항목 (ValidationError) — 도구 실행 전에 차단
+  거부  | 호스트에 명령 삽입 시도 (ValidationError) — 도구 실행 전에 차단

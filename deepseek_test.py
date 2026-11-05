@@ -4,7 +4,7 @@
 
 키는 이 파일에 쓰지 않는다. .env 의 DEEPSEEK_API_KEY 를 읽는다.
 DeepSeek은 OpenAI와 같은 형식의 API를 제공하므로 langchain-openai의 ChatOpenAI에
-DeepSeek 주소(base_url)만 바꿔서 연결한다. (Notion 02단계와 같은 방식)
+DeepSeek 주소(base_url)만 바꿔서 연결한다. (02_apis 단계와 같은 방식)
 """
 import os
 

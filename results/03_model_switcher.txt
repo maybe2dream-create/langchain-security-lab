@@ -1,0 +1,24 @@
+$ python model_switcher.py --provider google
+[설정] 현재 활성화된 모델 제공자: GOOGLE
+
+=== AI (GOOGLE) 답변 ===
+**추상화(Abstraction)**란 복잡한 대상이나 개념에서 핵심적인 특징만 남기고 불필요한 세부 사항은 제거하여 단순화하는 것입니다.
+
+$ python model_switcher.py --provider deepseek
+[설정] 현재 활성화된 모델 제공자: DEEPSEEK
+
+=== AI (DEEPSEEK) 답변 ===
+복잡한 현실에서 핵심적·공통적 특징만을 뽑아내어 단순화하는 것.
+
+$ python model_switcher.py --provider openai
+[설정] 현재 활성화된 모델 제공자: OPENAI
+
+[오류] .env 파일에 OPENAI_API_KEY가 설정되어 있지 않습니다.
+💡 .env 파일에 해당 제공자의 API 키를 입력했는지, 제공자 이름이 올바른지 확인해 주세요.
+
+$ python model_switcher.py --provider google --fallback deepseek
+[설정] 현재 활성화된 모델 제공자: GOOGLE
+[설정] 폴백 모델 제공자: DEEPSEEK
+
+=== AI (GOOGLE (실패 시 DEEPSEEK 폴백)) 답변 ===
+**추상화(Abstraction)**란 복잡한 대상이나 개념에서 핵심적인 특징만 남기고 불필요한 세부 사항은 생략하여 단순화하는 것입니다.
